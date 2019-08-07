@@ -1,0 +1,30 @@
+{
+  "name": "f-db",
+  "version": "1.0.0",
+  "description": "Observable implementation with ability to handle complex data structures",
+  "main": "dist/dataBase.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximilianMairinger/f-db.git"
+  },
+  "keywords": [
+    "Oberservable",
+    "json"
+  ],
+  "author": "Maximilian Mairinger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maximilianMairinger/f-db/issues"
+  },
+  "homepage": "https://github.com/maximilianMairinger/f-db#readme",
+  "dependencies": {
+    "xrray": "^3.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.0",
+    "typescript": "^3.5.3"
+  }
+}
