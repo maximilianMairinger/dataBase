@@ -78,7 +78,7 @@ export declare class Data<T = any> {
     subscribe(cb: (val: T) => any): void;
     private subscribeInternally;
     unsubscribe(cb: (val: T) => any | null): void;
-    toString(tabIn?: number, insideArray?: boolean): string;
+    toString(tabIn?: number, insideObject?: boolean): string;
     private notify;
     /**
      * Compares if all keys in this are equal to the equivelent ones on data

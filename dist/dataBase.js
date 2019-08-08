@@ -8,7 +8,7 @@ xrray();
 const { InvalidValueException } = xrray;
 class InvalidKey extends Error {
     constructor(key, data) {
-        super("Invalid key \"" + key + "\" for the following data structore:\n" + data.toString());
+        super("Invalid key \"" + key + "\" for the following data structure:\n" + data.toString());
     }
 }
 exports.InvalidKey = InvalidKey;
@@ -405,12 +405,12 @@ class Data {
         else
             this.cbs.clear();
     }
-    toString(tabIn = 0, insideArray = false) {
+    toString(tabIn = 0, insideObject = false) {
         tabIn++;
-        //debugger;
         let s = "";
         let v = this.val;
         if (typeof v === "object") {
+            let hasProps = false;
             let ar = v instanceof Array;
             if (ar)
                 s += "[";
@@ -420,17 +420,20 @@ class Data {
             for (let k in v) {
                 if (!v.hasOwnProperty(k))
                     continue;
+                hasProps = true;
                 //@ts-ignore
-                s += "\t".repeat(tabIn) + k + ": " + v[k].toString(tabIn, ar);
+                s += "\t".repeat(tabIn) + k + ": " + v[k].toString(tabIn, true);
             }
-            if (ar)
+            if (!hasProps)
+                s = s.substring(0, s.length - 1);
+            else {
                 s = s.substring(0, s.length - 2) + "\n";
-            s += "\t".repeat(tabIn - 1);
+                s += "\t".repeat(tabIn - 1);
+            }
             if (ar)
                 s += "]";
             else
                 s += "}";
-            s += insideArray ? "," : "";
         }
         else {
             let st = typeof v === "string";
@@ -440,6 +443,7 @@ class Data {
             if (st)
                 s += "\"";
         }
+        s += insideObject ? "," : "";
         return s + "\n";
     }
     notify(wild = false) {

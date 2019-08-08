@@ -9,7 +9,7 @@ const {InvalidValueException} = xrray;
 
 export class InvalidKey extends Error {
   constructor(key: string, data: Data) {
-    super("Invalid key \"" + key + "\" for the following data structore:\n" + data.toString());
+    super("Invalid key \"" + key + "\" for the following data structure:\n" + data.toString());
   }
 }
 
@@ -398,29 +398,30 @@ export class Data<T = any> {
     else this.cbs.clear();
   }
 
-  public toString(tabIn: number = 0, insideArray: boolean = false) {
+  public toString(tabIn: number = 0, insideObject = false) {
     tabIn++;
-    //debugger;
     let s = "";
     let v = this.val;
     if (typeof v === "object") {
+      let hasProps = false;
       let ar = v instanceof Array;
       if (ar) s += "[";
       else s += "{";
       s += "\n"
       for (let k in v) {
         if (!v.hasOwnProperty(k)) continue;
+        hasProps = true;
         //@ts-ignore
-        s += "\t".repeat(tabIn) + k + ": " + v[k].toString(tabIn, ar)
+        s += "\t".repeat(tabIn) + k + ": " + v[k].toString(tabIn, true)
       }
-      if (ar) s = s.substring(0, s.length-2) + "\n"
-
-      s += "\t".repeat(tabIn-1)
+      if (!hasProps) s = s.substring(0, s.length-1)
+      else {
+        s = s.substring(0, s.length-2) + "\n"
+        s += "\t".repeat(tabIn-1)
+      }
 
       if (ar) s += "]";
       else s += "}";
-
-      s += insideArray ? "," : ""
     }
     else {
       let st = typeof v === "string"
@@ -428,6 +429,7 @@ export class Data<T = any> {
       s += v;
       if (st) s += "\"";
     }
+    s += insideObject ? "," : ""
     return s + "\n";
   }
 
