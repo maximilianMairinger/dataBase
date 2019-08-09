@@ -391,9 +391,10 @@ class Data {
      * Subscribe to val
      * @param cb callback which gets called whenever the val changes
      */
-    subscribe(cb) {
+    subscribe(cb, init = true) {
         this.cbs.add(cb);
-        cb(this.val);
+        if (init)
+            cb(this.val);
     }
     subscribeInternally(cb) {
         this.internalCBs.add(cb);

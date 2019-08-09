@@ -383,9 +383,9 @@ export class Data<T = any> {
    * Subscribe to val
    * @param cb callback which gets called whenever the val changes
    */
-  public subscribe(cb: (val: T) => any): void {
+  public subscribe(cb: (val: T) => any, init: boolean = true): void {
     this.cbs.add(cb);
-    cb(this.val);
+    if (init) cb(this.val);
   }
 
   private subscribeInternally(cb: (val: T) => any): void {

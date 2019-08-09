@@ -75,7 +75,7 @@ export declare class Data<T = any> {
      * Subscribe to val
      * @param cb callback which gets called whenever the val changes
      */
-    subscribe(cb: (val: T) => any): void;
+    subscribe(cb: (val: T) => any, init?: boolean): void;
     private subscribeInternally;
     unsubscribe(cb: (val: T) => any | null): void;
     toString(tabIn?: number, insideObject?: boolean): string;
