@@ -233,6 +233,10 @@ interface Array<T> extends Object {
 	 * If the next index would be length the first one is returned
 	 */
 	 next(index: number, by?: number): T;
+   /**
+ 	 * Inject item at index
+ 	 */
+ 	inject(item: T, index: number): this
 }
 
 interface IndexOutOfBoundsException extends Exception {
