@@ -228,7 +228,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     super(data)
   }
 
-  public list<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, stepIntoPathAfterwards: string = "") {
+  public list<refT = any, refR = void>(loop: (db?: DataBase<refT>, i?: number) => refR, stepIntoPathAfterwards: string = ""): refR {
 
     for (let i = 0; i < this.length(); i++) {
       let end = loop(new DataBase(this.fds(i, stepIntoPathAfterwards)), i);

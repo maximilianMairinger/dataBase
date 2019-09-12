@@ -47,7 +47,7 @@ export declare class DataNumber<T = any> extends DataBase<number> {
 }
 export declare class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     constructor(data: Data<Array<Data<T>>>);
-    list<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, stepIntoPathAfterwards?: string): void;
+    list<refT = any, refR = void>(loop: (db?: DataBase<refT>, i?: number) => refR, stepIntoPathAfterwards?: string): refR;
     forEach<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, beforeLoop?: (() => void) | undefined, afterLoop?: (() => void) | undefined, stepIntoPathAfterwards?: string): Promise<any[]>;
     length(cb?: Function): number;
     realLength(cb?: Function): number;
