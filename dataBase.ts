@@ -210,7 +210,7 @@ export class DataBase<T> {
     return this.data.equals(that.data, true)
   }
   public same(that: DataBase<any>) {
-    return that.data.val === that.data.val;
+    return this.data.val === that.data.val;
   }
 }
 
@@ -219,10 +219,12 @@ export class DataNumber<T = any> extends DataBase<number> {
     super(data)
   }
   inc(by: number = 1) {
-    this.data.val = this.data.val + by;
+    this.data.val += by;
+    return this.data.val
   }
   dec(by: number = 1) {
-    this.data.val = this.data.val - by;
+    this.data.val -= by;
+    return this.data.val
   }
 }
 

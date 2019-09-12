@@ -43,8 +43,8 @@ export declare class DataBase<T> {
 }
 export declare class DataNumber<T = any> extends DataBase<number> {
     constructor(data: Data<number>);
-    inc(by?: number): void;
-    dec(by?: number): void;
+    inc(by?: number): number;
+    dec(by?: number): number;
 }
 export declare class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     constructor(data: Data<Array<Data<T>>>);

@@ -206,7 +206,7 @@ class DataBase {
         return this.data.equals(that.data, true);
     }
     same(that) {
-        return that.data.val === that.data.val;
+        return this.data.val === that.data.val;
     }
 }
 exports.DataBase = DataBase;
@@ -215,10 +215,12 @@ class DataNumber extends DataBase {
         super(data);
     }
     inc(by = 1) {
-        this.data.val = this.data.val + by;
+        this.data.val += by;
+        return this.data.val;
     }
     dec(by = 1) {
-        this.data.val = this.data.val - by;
+        this.data.val -= by;
+        return this.data.val;
     }
 }
 exports.DataNumber = DataNumber;
