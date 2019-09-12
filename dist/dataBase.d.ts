@@ -8,6 +8,7 @@ export default function setData(data: object, location?: any | Data<any>, comple
 export declare class DataBase<T> {
     protected data: Data<T>;
     constructor(data: Data<T>);
+    toString(): string;
     /**
      * Gets a reference to subData found under given key(s) / path
      * A reference is a new DataBase instance just containing the referenced Data

@@ -72,6 +72,9 @@ export class DataBase<T> {
   constructor(protected data: Data<T>) {
 
   }
+  public toString() {
+    return "DataBase: " + this.data.toString()
+  }
   /**
    * Gets a reference to subData found under given key(s) / path
    * A reference is a new DataBase instance just containing the referenced Data
@@ -383,7 +386,7 @@ export class Data<T = any> {
    * Subscribe to val
    * @param cb callback which gets called whenever the val changes
    */
-  public subscribe(cb: (val: T) => any, init: boolean = true): void {
+  public subscribe(cb: (val: T) => any, init: boolean = true) {
     this.cbs.add(cb);
     if (init) cb(this.val);
   }

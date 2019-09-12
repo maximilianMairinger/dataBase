@@ -82,6 +82,9 @@ class DataBase {
     constructor(data) {
         this.data = data;
     }
+    toString() {
+        return "DataBase: " + this.data.toString();
+    }
     /**
      * Gets a reference to subData found under given key(s) / path
      * A reference is a new DataBase instance just containing the referenced Data
