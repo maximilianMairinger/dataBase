@@ -94,6 +94,9 @@ export class DataBase<T> {
     return (this.fds(...keys)).val;
   }
 
+  // TODO
+  // Overthink this logic. Do we really want to not parse the res of given key data.
+  // Shouldnt it be like lang in LBP? can you simplify lang then?
 
   public get(key: string | number | Data<any>): Data<any>
   public get(key: Array<string | number | Data<any>>): Data<any>[]
