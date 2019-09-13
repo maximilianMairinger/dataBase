@@ -1,6 +1,6 @@
 {
   "name": "front-db",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Observable implementation with ability to handle complex data structures",
   "main": "dist/dataBase.js",
   "scripts": {
@@ -24,7 +24,7 @@
     "xrray": "^4.0.1"
   },
   "devDependencies": {
-    "@types/node": "^12.7.0",
+    "@types/node": "^12.7.5",
     "typescript": "^3.5.3"
   }
 }

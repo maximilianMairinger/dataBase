@@ -8,6 +8,7 @@ export default function setData(data: object, location?: any | Data<any>, comple
 export declare class DataBase<T> {
     protected data: Data<T>;
     constructor(data: Data<T>);
+    toString(): string;
     /**
      * Gets a reference to subData found under given key(s) / path
      * A reference is a new DataBase instance just containing the referenced Data
@@ -42,12 +43,12 @@ export declare class DataBase<T> {
 }
 export declare class DataNumber<T = any> extends DataBase<number> {
     constructor(data: Data<number>);
-    inc(by?: number): void;
-    dec(by?: number): void;
+    inc(by?: number): number;
+    dec(by?: number): number;
 }
 export declare class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     constructor(data: Data<Array<Data<T>>>);
-    list<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, stepIntoPathAfterwards?: string): void;
+    list<refT = any, refR = void>(loop: (db?: DataBase<refT>, i?: number) => refR, stepIntoPathAfterwards?: string): refR;
     forEach<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, beforeLoop?: (() => void) | undefined, afterLoop?: (() => void) | undefined, stepIntoPathAfterwards?: string): Promise<any[]>;
     length(cb?: Function): number;
     realLength(cb?: Function): number;

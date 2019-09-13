@@ -72,6 +72,9 @@ export class DataBase<T> {
   constructor(protected data: Data<T>) {
 
   }
+  public toString() {
+    return "DataBase: " + this.data.toString()
+  }
   /**
    * Gets a reference to subData found under given key(s) / path
    * A reference is a new DataBase instance just containing the referenced Data
@@ -91,6 +94,9 @@ export class DataBase<T> {
     return (this.fds(...keys)).val;
   }
 
+  // TODO
+  // Overthink this logic. Do we really want to not parse the res of given key data.
+  // Shouldnt it be like lang in LBP? can you simplify lang then?
 
   public get(key: string | number | Data<any>): Data<any>
   public get(key: Array<string | number | Data<any>>): Data<any>[]
@@ -207,7 +213,7 @@ export class DataBase<T> {
     return this.data.equals(that.data, true)
   }
   public same(that: DataBase<any>) {
-    return that.data.val === that.data.val;
+    return this.data.val === that.data.val;
   }
 }
 
@@ -216,10 +222,12 @@ export class DataNumber<T = any> extends DataBase<number> {
     super(data)
   }
   inc(by: number = 1) {
-    this.data.val = this.data.val + by;
+    this.data.val += by;
+    return this.data.val
   }
   dec(by: number = 1) {
-    this.data.val = this.data.val - by;
+    this.data.val -= by;
+    return this.data.val
   }
 }
 
@@ -228,7 +236,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     super(data)
   }
 
-  public list<refT = any>(loop: (db?: DataBase<refT>, i?: number) => void, stepIntoPathAfterwards: string = "") {
+  public list<refT = any, refR = void>(loop: (db?: DataBase<refT>, i?: number) => refR, stepIntoPathAfterwards: string = ""): refR {
 
     for (let i = 0; i < this.length(); i++) {
       let end = loop(new DataBase(this.fds(i, stepIntoPathAfterwards)), i);
@@ -383,7 +391,7 @@ export class Data<T = any> {
    * Subscribe to val
    * @param cb callback which gets called whenever the val changes
    */
-  public subscribe(cb: (val: T) => any, init: boolean = true): void {
+  public subscribe(cb: (val: T) => any, init: boolean = true) {
     this.cbs.add(cb);
     if (init) cb(this.val);
   }
