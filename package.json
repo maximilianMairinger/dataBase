@@ -4,7 +4,7 @@
   "description": "Observable implementation with ability to handle complex data structures",
   "main": "dist/dataBase.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
