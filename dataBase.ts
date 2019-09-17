@@ -199,12 +199,13 @@ export class DataBase<T> {
 
     return last
   }
-  public get asArray() {
+  //TODO: make this available for DB as a whole and limit acces via interfaces (conditinal types)
+  public get asArray(): DataArray<T> {
     //@ts-ignore
     if (this.data.val instanceof Array) return new DataArray(this.data)
     else throw new InvalidCast(Array);
   }
-  public get asNumber() {
+  public get asNumber(): DataNumber<T> {
     //@ts-ignore
     if (typeof this.data.val === "number") return new DataNumber(this.data)
     else throw new InvalidCast(Number);
