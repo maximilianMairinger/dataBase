@@ -236,7 +236,15 @@ interface Array<T> extends Object {
    /**
  	 * Inject item at index
  	 */
- 	inject(item: T, index: number): this
+	 inject(item: T, index: number): this
+	 /**
+	 * True if all given vals are included within this
+	 */
+  contains(...vals: T[]): boolean
+  /**
+	 * True if non of the given vals are included within this
+	 */
+	excludes(...vals: T[]): boolean
 }
 
 interface IndexOutOfBoundsException extends Exception {

@@ -1,6 +1,6 @@
 {
   "name": "front-db",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Observable implementation with ability to handle complex data structures",
   "main": "dist/dataBase.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/maximilianMairinger/f-db#readme",
   "dependencies": {
-    "xrray": "^4.0.1"
+    "xrray": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^12.7.5",
