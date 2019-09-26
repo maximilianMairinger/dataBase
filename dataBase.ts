@@ -210,7 +210,7 @@ export class DataBase<T> {
     else throw new InvalidCast(Number);
   }
   public equals(that: DataBase<any>) {
-    return this.data.equals(that.data, true)
+    return (that === undefined) ? false : this.data.equals(that.data, true)
   }
   public same(that: DataBase<any>) {
     return this.data.val === that.data.val;

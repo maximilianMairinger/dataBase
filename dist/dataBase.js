@@ -203,7 +203,7 @@ class DataBase {
             throw new InvalidCast(Number);
     }
     equals(that) {
-        return this.data.equals(that.data, true);
+        return (that === undefined) ? false : this.data.equals(that.data, true);
     }
     same(that) {
         return this.data.val === that.data.val;
