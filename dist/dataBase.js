@@ -188,6 +188,7 @@ class DataBase {
         });
         return last;
     }
+    //TODO: make this available for DB as a whole and limit acces via interfaces (conditinal types)
     get asArray() {
         //@ts-ignore
         if (this.data.val instanceof Array)

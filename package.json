@@ -4,7 +4,7 @@
   "description": "Observable implementation with ability to handle complex data structures",
   "main": "dist/dataBase.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/maximilianMairinger/f-db#readme",
   "dependencies": {
-    "xrray": "^4.0.1"
+    "xrray": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^12.7.5",
