@@ -1,23 +1,19 @@
-"use strict";
 // This file basically contains a observable Class (called Data) and a
 // DataBase which contains a komplex (not primitiv types = objects)
 // map off Observables as is often given when requesting data (e.g. JSON).
-Object.defineProperty(exports, "__esModule", { value: true });
-let xrray = require("xrray");
-xrray();
-const { InvalidValueException } = xrray;
-class InvalidKey extends Error {
+let Xrray = require("xrray");
+Xrray(Array);
+const { InvalidValueException } = Xrray;
+export class InvalidKey extends Error {
     constructor(key, data) {
         super("Invalid key \"" + key + "\" for the following data structure:\n" + data.toString());
     }
 }
-exports.InvalidKey = InvalidKey;
-class InvalidCast extends Error {
+export class InvalidCast extends Error {
     constructor(castAttempt) {
         super("Cannot cast to " + castAttempt.name);
     }
 }
-exports.InvalidCast = InvalidCast;
 // Formats fetched ( = raw) data into an nested Data construct.
 function formatData(fetched, formatLocation, deleteUnseenVals = false) {
     if (formatLocation === undefined)
@@ -65,7 +61,7 @@ function formatData(fetched, formatLocation, deleteUnseenVals = false) {
         formatLocation.val = fetched;
     return formatLocation;
 }
-function setData(data, location, complete) {
+export default function setData(data, location, complete) {
     if (!(location instanceof Data) && location !== undefined)
         location = new Data(location);
     let dataLocation = formatData(data, location);
@@ -73,12 +69,11 @@ function setData(data, location, complete) {
         complete();
     return new DataBase(dataLocation);
 }
-exports.default = setData;
 /*
  * Holds and handles access to an complex map of data. This data Consisits of in each other nexted Data intsances
  * (to init such an map, consult formatData.)
  */
-class DataBase {
+export class DataBase {
     constructor(data) {
         this.data = data;
     }
@@ -210,8 +205,7 @@ class DataBase {
         return this.data.val === that.data.val;
     }
 }
-exports.DataBase = DataBase;
-class DataNumber extends DataBase {
+export class DataNumber extends DataBase {
     constructor(data) {
         super(data);
     }
@@ -224,8 +218,7 @@ class DataNumber extends DataBase {
         return this.data.val;
     }
 }
-exports.DataNumber = DataNumber;
-class DataArray extends DataBase {
+export class DataArray extends DataBase {
     constructor(data) {
         super(data);
     }
@@ -371,8 +364,7 @@ class DataArray extends DataBase {
     }
 }
 DataArray.morphMap = new Map();
-exports.DataArray = DataArray;
-class Data {
+export class Data {
     constructor(val) {
         this.cbs = [];
         this.internalCBs = [];
@@ -530,4 +522,3 @@ class Data {
         return d;
     }
 }
-exports.Data = Data;

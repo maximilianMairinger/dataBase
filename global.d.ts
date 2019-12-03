@@ -1,20 +1,8 @@
-interface Object {
-  cloneData: <T extends Object>() => T;
- /**
-  * Iterates over all own properties
-  * awaits any promises
-  * when !== undefined gets returned => the the loop stopts and the returned val gets returned
-  */
- ea<R>(loop: (e?: any, i?: number, ...args: any) => R, thisArg?: any): R;
- /**
-  * Iterates over all own properties
-  * awaits any promises
-  * when !== undefined gets returned => the the loop stopts and the returned val gets returned
-  */
- each<R>(loop: (e?: any, i?: number, ...args: any) => R, thisArg?: any): R;
-}
-
-interface Array<T> extends Object {
+interface Array<T> {
+	/**
+	 * True if xrray is attatched
+	 */
+	readonly xrray: boolean;
 	/**
 	 * True if empty
 	 */
@@ -27,10 +15,17 @@ interface Array<T> extends Object {
 	 * First element
 	 */
 	readonly first: T;
+
 	/**
 	 * length without empty slots
 	 */
 	readonly realLength: number;
+
+	/**
+	 * clones
+	 */
+	clone(): T[];
+
 	/**
 	 * Clears the array of all elements
 	 */
@@ -52,24 +47,12 @@ interface Array<T> extends Object {
 	/**
 	 * Sets the array to the given one without chnaging the refernece
 	 */
-	set(array: T[] | T[]): T[];
+	set(array: T[]): T[];
 	/**
 	 * Sets the array to the given one without chnaging the refernece
 	 * The inital array stays unchanged; a new one gets inited;
 	 */
-	Set(array: T[] | T[]): T[];
-	/**
-	 * Iterates over all own properties
-	 * awaits any promises
-	 * when !== undefined gets returned => the the loop stopts and the returned val gets returned
-	 */
-	ea<R>(loop: (e?: any, i?: number, ...args: any) => R, thisArg?: any): R;
-	/**
-	 * Iterates over all own properties
-	 * awaits any promises
-	 * when !== undefined gets returned => the the loop stopts and the returned val gets returned
-	 */
-	each<R>(loop: (e?: any, i?: number, ...args: any) => R, thisArg?: any): R;
+	Set(array: T[]): T[];
 	/**
 	 * Reverts the array
 	 * The inital array stays unchanged; a new one gets inited;
@@ -83,10 +66,6 @@ interface Array<T> extends Object {
 	 * Cleans the array of all nulls and undefineds
 	 */
 	clean(): T[];
-	/**
-	 * clones
-	 */
-	clone(): T[];
 	/**
 	 * Cleans the array of all nulls and undefineds
 	 * The inital array stays unchanged; a new one gets inited;
@@ -214,18 +193,34 @@ interface Array<T> extends Object {
 	 * The inital array stays unchanged; a new one gets inited;
 	 */
 	Flat(ammount?: number): T[]
-	 /**
- 	 * Add elements a to array but only if they are not already present
- 	 */
- 	gather(...a: T[]): this;
- 	/**
- 	 * Add elements a to array but only if they are not already present
- 	 * The inital array stays unchanged; a new one gets inited;
- 	 */
- 	Gather(...a: T[]): T[];
+
+	/**
+	 * Alias for forEach.
+	 * awaits any promises
+	 * when !== undefined gets returned => the the loop stopts and the returned val gets returned
+	 */
+	each(loop: (e?: T, i?: number, ...args: any) => any, thisArg?: any): any;
+	/**
+	 * Alias for forEach.
+	 * awaits any promises
+	 * when !== undefined gets returned => the the loop stopts and the returned val gets returned
+	 */
+	ea(loop: (e?: T, i?: number, ...args: any) => any, thisArg?: any): any;
+
+	/**
+	 * Add elements a to array but only if they are not already present
+	 */
+	gather(...a: T[]): this;
+	/**
+	 * Add elements a to array but only if they are not already present
+	 * The inital array stays unchanged; a new one gets inited;
+	 */
+	Gather(...a: T[]): T[];
+
+
 	/**
 	 * Gets the element prior of that given as index
-	 * If the prior index would be -1 the last one is returned
+	 * If the prior index would be -1 the last element is returned
 	 */
 	prior(index: number, by?: number): T;
 	/**
@@ -233,38 +228,8 @@ interface Array<T> extends Object {
 	 * If the next index would be length the first one is returned
 	 */
 	 next(index: number, by?: number): T;
-   /**
- 	 * Inject item at index
- 	 */
-	 inject(item: T, index: number): this
 	 /**
-	 * True if all given vals are included within this
-	 */
-  contains(...vals: T[]): boolean
-  /**
-	 * True if non of the given vals are included within this
-	 */
-	excludes(...vals: T[]): boolean
-}
-
-interface IndexOutOfBoundsException extends Exception {
-	index: number;
-	array: any[];
-}
-
-interface InvalidInputException extends Exception {
-
-}
-
-interface InvalidConstructorException extends Exception {
-
-}
-
-interface InvalidValueException extends Exception {
-	value: any;
-	array: any[];
-}
-
-interface Exception extends Error {
-	message: string;
+ 	 * Slice alias
+ 	 */
+	 copy(): T[];
 }

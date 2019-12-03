@@ -36,8 +36,8 @@ export declare class DataBase<T> {
      */
     protected rad(...keys: Array<string | number>): Data<any>;
     protected fds(...keys: Array<string | number>): Data<any>;
-    readonly asArray: DataArray<T>;
-    readonly asNumber: DataNumber<T>;
+    get asArray(): DataArray<T>;
+    get asNumber(): DataNumber<T>;
     equals(that: DataBase<any>): boolean;
     same(that: DataBase<any>): boolean;
 }
@@ -68,10 +68,11 @@ export declare class Data<T = any> {
     /**
      * Set the val
      */
+    set val(to: T);
     /**
-    * Gets the current val
-    */
-    val: T;
+     * Gets the current val
+     */
+    get val(): T;
     /**
      * Subscribe to val
      * @param cb callback which gets called whenever the val changes
