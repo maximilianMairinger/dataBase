@@ -396,6 +396,7 @@ export class Data<T = any> {
   public subscribe(cb: (val: T) => any, init: boolean = true) {
     this.cbs.add(cb);
     if (init) cb(this.val);
+    return cb
   }
 
   private subscribeInternally(cb: (val: T) => any): void {
