@@ -393,6 +393,7 @@ export class Data {
         this.cbs.add(cb);
         if (init)
             cb(this.val);
+        return cb;
     }
     subscribeInternally(cb) {
         this.internalCBs.add(cb);
