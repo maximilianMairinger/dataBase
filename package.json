@@ -1,5 +1,5 @@
 {
-  "name": "f-db",
+  "name": "front-db",
   "version": "1.0.0",
   "description": "",
   "main": "app/dist/f-db.js",
@@ -42,5 +42,6 @@
   },
   "dependencies": {
     "xrray": "^4.0.4"
-  }
+  },
+  "sideEffects": false
 }
