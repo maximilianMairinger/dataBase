@@ -233,6 +233,8 @@ export class DataNumber<T = any> extends DataBase<number> {
   }
 }
 
+const DataArray_morphMap: Map<Data<Array<any>>, ((db?: DataBase<any> | null, i?: number) => void)[]> = new Map();
+
 export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
   constructor(data: Data<Array<Data<T>>>) {
     super(data)
@@ -301,7 +303,6 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
       this.beforeLastChange = this.data.clone();
     })
   }
-  private static morphMap: Map<Data<Array<any>>, ((db?: DataBase<any> | null, i?: number) => void)[]> = new Map();
   public morph(cb: (db?: DataBase<any> | null, i?: number) => void, initalizeLoop = false) {
     this.beforeLastChange = this.data.clone();
     if (initalizeLoop) {
@@ -310,8 +311,8 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
       })
     }
 
-    let cba = DataArray.morphMap.get(this.data);
-    if (cba === undefined) DataArray.morphMap.set(this.data, [cb]);
+    let cba = DataArray_morphMap.get(this.data);
+    if (cba === undefined) DataArray_morphMap.set(this.data, [cb]);
     else cba.add(cb);
   }
   public add(val: T, atIndex?: number) {
@@ -331,7 +332,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
 
     formatData(ob, this.data)
 
-    let cba = DataArray.morphMap.get(this.data);
+    let cba = DataArray_morphMap.get(this.data);
     if (cba !== undefined) cba.ea((f) => {
       f(new DataBase(this.data.val[atIndex]), atIndex)
     })
@@ -342,7 +343,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     //@ts-ignore
     this.data.notify(true);
 
-    let cba = DataArray.morphMap.get(this.data);
+    let cba = DataArray_morphMap.get(this.data);
     if (cba !== undefined) cba.ea((f) => {
       f(null, index)
     })
@@ -357,7 +358,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
     else delete this.data.val[index];
     //@ts-ignore
     this.data.notify(true);
-    let cba = DataArray.morphMap.get(this.data);
+    let cba = DataArray_morphMap.get(this.data);
     if (cba !== undefined) cba.ea((f) => {
       f(null, index)
     })
