@@ -259,7 +259,7 @@ export class DataArray<T = any> extends DataBase<Array<Data<T>>> {
         return e instanceof Promise;
       })
       if (afterLoop !== undefined) {
-        if (proms.length === 0) Promise.all(proms).then(afterLoop)
+        if (proms.length !== 0) Promise.all(proms).then(afterLoop)
         else afterLoop();
       }
     })
