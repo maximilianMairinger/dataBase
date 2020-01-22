@@ -245,9 +245,19 @@ interface Array<T> {
 	/*
 	* Steps into step of all entries
 	*/
-	inner<Key extends keyof T, Val extends T[Key] = T[Key]>(step: Key, callParams?: Val extends (...args: any) => any ? Parameters<Val> : never): Val extends Function ? ReturnType<Val>[] : Val[]
+	inner<Key extends keyof T, Val extends T[Key] = T[Key]>(step: Key, callParams?: Val extends (...args: any) => any ? Parameters<Val> : never): Val extends (...args: any) => any ? ReturnType<Val>[] : Val[]
 	/*
 	* Steps into step of all entries
 	*/
-	Inner<Key extends keyof T, Val extends T[Key] = T[Key]>(step: Key, callParams?: Val extends (...args: any) => any ? Parameters<Val> : never): Val extends Function ? ReturnType<Val>[] : Val[]
+	Inner<Key extends keyof T, Val extends T[Key] = T[Key]>(step: Key, callParams?: Val extends (...args: any) => any ? Parameters<Val> : never): Val extends (...args: any) => any ? ReturnType<Val>[] : Val[]
+
+
+	/*
+	* Calls all entries
+	*/
+	call(...callParams: T extends (...args: any) => any ? Parameters<T> : never): T extends (...args: any) => any ? ReturnType<T>[] : never
+	/*
+	* Calls all entries
+	*/
+	Call(...callParams: T extends (...args: any) => any ? Parameters<T> : never): T extends (...args: any) => any ? ReturnType<T>[] : never
 }

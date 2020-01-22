@@ -1,3 +1,5 @@
+require("xrray")(Array)
+
 type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
@@ -5,28 +7,28 @@ type Subscription<Values extends any[]> = (...value: Values) => void | Promise<v
 
 export class Data<Values extends [Value], Value = Values[0]> {
   private value: Value
-  private subsciptions: Subscription<[Value]>[]
+  private subscriptions: Subscription<[Value]>[] = []
 
-  public constructor(value: Value) {
+  public constructor(value?: Value) {
     this.value = value
   }
 
   public get(): Value
-  public get(observer: Subscription<Values>, initialize?: boolean): typeof observer
-  public get(observer?: Subscription<Values>, initialize: boolean = false): Value | typeof observer {
-    if (observer) {
-      this.subscribe(observer, initialize)
+  public get(subscription: Subscription<Values>, initialize?: boolean): Subscription<Values>
+  public get(subscription?: Subscription<Values>, initialize: boolean = true): Value | Subscription<Values> {
+    if (subscription) {
+      this.subscribe(subscription, initialize)
     }
     else return this.value
   }
-  private subscribe(observer: Subscription<[Value]>, initialize: boolean): void | Promise<void> {
-    this.subsciptions.add(observer)
-    if (initialize) return observer(this.value)
+  private subscribe(subscription: Subscription<[Value]>, initialize: boolean): void | Promise<void> {
+    this.subscriptions.add(subscription)
+    if (initialize) return subscription(this.value)
   }
-
-  public got(observer: Subscription<Values>): typeof observer {
-    this.subsciptions.rmV(observer)
-    return observer
+  // TODO return true when successfull
+  public got(subscription: Subscription<Values>): Subscription<Values> {
+    this.subscriptions.rmV(subscription)
+    return subscription
   }
 
   public set(value: Value): Value
@@ -35,14 +37,14 @@ export class Data<Values extends [Value], Value = Values[0]> {
   public set(value: Value, wait: boolean = false): Value | Promise<Value> {
     this.value = value
     if (wait) {
-      for (let subscription of this.subsciptions) {
+      for (let subscription of this.subscriptions) {
         subscription(value)
       }
       return value
     }
     else {
       return (async () => {
-        for (let subscription of this.subsciptions) {
+        for (let subscription of this.subscriptions) {
           await subscription(value)
         }
         return value
@@ -52,57 +54,72 @@ export class Data<Values extends [Value], Value = Values[0]> {
 }
 
 
+type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values>
 
-type DataSetify<T> = { 
-  //@ts-ignore
-  [P in keyof T]: DataSet<T[P]>
+type DataSetify<T extends any[]> = { 
+  [P in keyof T]: DataSet<[T[P]]>
 }
 
 
 
 
+class DataCollection<Values extends any[], Value extends Values[number] = Values[number]> {
+  private subscriptions: Subscription<Values>[] = []
+  //@ts-ignore
+  private datas: DataSetify<Values> = []
+  private store: Values
 
-class DataCollection<Values extends any[]> {
-  private observers: Subscription<Values>[] = []
-  private datas: DataSetify<Values>
+  private observers: Subscription<[Value]>[]
+
   constructor(...datas: DataSetify<Values>) {
+    //@ts-ignore
+    this.set(...datas)
+  }
+
+  public set(...datas: DataSetify<Values>) {
+    this.datas.ea((data, i) => {
+      data.got(this.observers[i])
+    })
+    this.observers.clear()
+
     this.datas = datas
+    //@ts-ignore
+    this.store = [...this.get()]
+
+
+    this.datas.ea((data, i) => {
+      const observer = (val: Value) => {
+        this.store[i] = val
+        //@ts-ignore
+        this.datas.Inner("subscribe", [this.store])
+      }
+      this.observers[i] = observer
+      //@ts-ignore
+      data.subscribe(observer, false)
+    })
   }
 
 
-  private subscribe(observer: Subscription<Values>, initialize: boolean) {
-    this.observers.add(observer)
-    if (initialize) observer(...this.get())
+  private subscribe(subscription: Subscription<Values>, initialize: boolean): Subscription<Values> {
+    this.subscriptions.add(subscription)
+    if (initialize) subscription(...this.store)
+    return subscription
   }
 
   public get(): Values
-  public get(observer: Subscription<Values>, initialize?: boolean): DataSubscription<Values>
-  public get(observer?: Subscription<Values>, initialize: boolean = true): DataSubscription<Values> | Values[] {
+  public get(subscription: Subscription<Values>, initialize?: boolean): DataSubscription<Values>
+  public get(subscription?: Subscription<Values>, initialize: boolean = true): DataSubscription<Values> | Values {
     //@ts-ignore
-    if (observer === undefined) return this.datas.Inner("get", [])
-    else return new DataSubscription(this, observer, true, initialize)
+    if (subscription === undefined) return this.datas.Inner("get", [])
+    else return new DataSubscription(this, subscription, true, initialize)
   }
-  public got(observer: Subscription<Values>): Subscription<Values> {
-    throw new Error("Method not implemented.")
+  public got(subscription: Subscription<Values>): Subscription<Values> {
+    this.subscriptions.rmV(subscription)
+    return subscription
   }
 
 } 
 
-
-
-type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values>
-
-
-let ssssssssss: DataSet<[true, "false"]> = new DataCollection(new Data(true), new Data("false"))
-ssssssssss.get((s, w) => {
-  s
-})
-
-type C = number
-
-type A<T extends Array<any>> = T extends Array<infer U> ? U extends number ? true : false : false
-
-type B = A<C[]>
 
 
 class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values> = ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values>> {
@@ -148,11 +165,30 @@ class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values
   }
 
   
-  public data()
-  public data(data: ConcreteData)
-  public data() {
-
+  public data(): ConcreteData
+  public data(data: ConcreteData): this
+  public data(data?: ConcreteData): ConcreteData | this {
+    if (data == undefined) return this._data
+    else {
+      let isActive = this.active
+      this.deacivate()
+      this._data = data
+      if (isActive) this.acivate()
+      return this
+    }
   }
   
+  public subscription(): ConcreteSubscription
+  public subscription(subscription: ConcreteSubscription, initialize?: boolean): this
+  public subscription(subscription?: ConcreteSubscription, initialize?: boolean): ConcreteSubscription | this {
+    if (subscription === undefined) return this._subscription
+    else {
+      let isActive = this.active
+      this.deacivate()
+      this._subscription = subscription
+      if (isActive) this.acivate()
+      return this
+    }
+  }
 }
 
