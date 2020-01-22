@@ -35,6 +35,7 @@ export class Data<Values extends [Value], Value = Values[0]> {
   public set(value: Value, wait: false): Value
   public set(value: Value, wait: true): Promise<Value>
   public set(value: Value, wait: boolean = false): Value | Promise<Value> {
+    if (value === this.value) return value
     this.value = value
     if (wait) {
       for (let subscription of this.subscriptions) {
