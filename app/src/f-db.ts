@@ -1,34 +1,38 @@
 type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
-export class Data<Value> {
+
+
+export class Data<Values extends [Value], Value = Values[0]> {
   private value: Value
   private subsciptions: Subscription<[Value]>[]
 
-  public constructor(value?: Value) {
+  public constructor(value: Value) {
     this.value = value
   }
 
   public get(): Value
-  public get(observer: Subscription<[Value]>, initialize?: boolean): typeof observer
-  public get(observer?: Subscription<[Value]>, initialize: boolean = false): Value | typeof observer {
+  public get(observer: Subscription<Values>, initialize?: boolean): typeof observer
+  public get(observer?: Subscription<Values>, initialize: boolean = false): Value | typeof observer {
     if (observer) {
-      this.subsciptions.add(observer)
-      if (initialize) observer(this.value)
-      return observer
+      this.subscribe(observer, initialize)
     }
     else return this.value
   }
+  private subscribe(observer: Subscription<[Value]>, initialize: boolean): void | Promise<void> {
+    this.subsciptions.add(observer)
+    if (initialize) return observer(this.value)
+  }
 
-  public got(observer: Subscription<[Value]>): typeof observer {
+  public got(observer: Subscription<Values>): typeof observer {
     this.subsciptions.rmV(observer)
     return observer
   }
 
-  public set(value: Value): typeof value
-  public set(value: Value, wait: false): typeof value
-  public set(value: Value, wait: true): Promise<typeof value>
-  public set(value: Value, wait: boolean = false): typeof value | Promise<typeof value> {
+  public set(value: Value): Value
+  public set(value: Value, wait: false): Value
+  public set(value: Value, wait: true): Promise<Value>
+  public set(value: Value, wait: boolean = false): Value | Promise<Value> {
     this.value = value
     if (wait) {
       for (let subscription of this.subsciptions) {
@@ -48,18 +52,17 @@ export class Data<Value> {
 }
 
 
+
 type DataSetify<T> = { 
+  //@ts-ignore
   [P in keyof T]: DataSet<T[P]>
 }
 
 
 
-type Tupleify<TupleOrNot> = TupleOrNot extends any[] ? TupleOrNot : [TupleOrNot]
-type Tuple = [...any[]]
 
 
-
-class DataCollection<Value_Values, Values extends Tupleify<Value_Values> = Tupleify<Value_Values>> {
+class DataCollection<Values extends any[]> {
   private observers: Subscription<Values>[] = []
   private datas: DataSetify<Values>
   constructor(...datas: DataSetify<Values>) {
@@ -87,7 +90,7 @@ class DataCollection<Value_Values, Values extends Tupleify<Value_Values> = Tuple
 
 
 
-type DataSet<Value> = Data<Value> | DataCollection<Value>
+type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values>
 
 
 let ssssssssss: DataSet<[true, "false"]> = new DataCollection(new Data(true), new Data("false"))
@@ -95,12 +98,27 @@ ssssssssss.get((s, w) => {
   s
 })
 
-class DataSubscription<Value_Values, Values extends Tupleify<Value_Values> = Tupleify<Value_Values>> {
+type C = number
+
+type A<T extends Array<any>> = T extends Array<infer U> ? U extends number ? true : false : false
+
+type B = A<C[]>
+
+
+class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values> = ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values>> {
   private _active: boolean = false
 
-  constructor(data: DataSet<Value_Values>, subscription: Subscription<Values>, activate?: false)
-  constructor(data: DataSet<Value_Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
-  constructor(private _data: DataSet<Value_Values>, private _subscription: Subscription<Values>, activate?: boolean, inititalize?: boolean) {
+  private _subscription: ConcreteSubscription
+  private _data: ConcreteData
+
+  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
+  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+  constructor(data: Data<[Values[0]]>, subscription: Subscription<[Values[0]]>, activate?: false)
+  constructor(data: Data<[Values[0]]>, subscription: Subscription<[Values[0]]>, activate?: true, inititalize?: boolean)
+  constructor(data: ConcreteData, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate?: boolean, inititalize?: boolean) {
+    this._data = data
+    //@ts-ignore
+    this._subscription = _subscription
     //@ts-ignore
     this.active(activate, inititalize)
   }
@@ -108,18 +126,16 @@ class DataSubscription<Value_Values, Values extends Tupleify<Value_Values> = Tup
   public acivate(initialize: boolean = true): this {
     if (this._active) return
     this._active = true
-
-    this._data.get(this._subscription, initialize)
-
-
-
+    //@ts-ignore
+    this._data.subscribe(this._subscription, initialize)
     return this
   }
 
   public deacivate(): this {
     if (!this._active) return
     this._active = false
-    
+    //@ts-ignore
+    this._data.got(this._subscription)
     return this
   }
 
@@ -129,6 +145,13 @@ class DataSubscription<Value_Values, Values extends Tupleify<Value_Values> = Tup
     if (activate) this.acivate(initialize)
     else this.deacivate()
     return this
+  }
+
+  
+  public data()
+  public data(data: ConcreteData)
+  public data() {
+
   }
   
 }
