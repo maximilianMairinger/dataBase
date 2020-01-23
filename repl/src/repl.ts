@@ -1,4 +1,4 @@
-import { Data } from "./../../app/src/f-db"
+import { Data } from "../../app/src/f-db"
 import delay from "delay"
 
 
