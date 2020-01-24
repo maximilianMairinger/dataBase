@@ -55,7 +55,7 @@ export class Data<Values extends [Value], Value = Values[0]> {
 }
 
 
-type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values>
+type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values[number]>
 
 type DataSetify<T extends any[]> = { 
   [P in keyof T]: DataSet<[T[P]]>
