@@ -122,17 +122,17 @@ export class DataCollection<Values extends any[], Value extends Values[number] =
 
 
 
-export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[0]], Value = TupleValue[0], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values> = ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values>> {
+export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[number]], Value = TupleValue[0], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values> = ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values>> {
   private _active: boolean = false
 
   private _subscription: ConcreteSubscription
   private _data: ConcreteData
 
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
-  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
-  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: false)
-  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
-  constructor(data: Data<TupleValue> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate: boolean = true, inititalize: boolean = true) {
+  // constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+  // constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: false)
+  // constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
+  constructor(data: Data<TupleValue> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<TupleValue>, activate: boolean = true, inititalize: boolean = true) {
     //@ts-ignore
     this._data = data
     //@ts-ignore

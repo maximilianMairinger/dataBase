@@ -5,7 +5,7 @@ import delay from "delay"
 let e = new Data("hello")
 let w = new Data(2)
 
-let col = new DataCollection(e,w)
+let col = new DataCollection(e, w)
 
 col.get((e, w) => {
   console.log(e, w)
@@ -18,5 +18,7 @@ let subs = (e: number) => {
 
 }
 
-let s = new DataSubscription(w, subs)
+let s = new DataSubscription(col, (a, b) => {
+
+})
 
