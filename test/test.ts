@@ -1,4 +1,4 @@
-import { Data, DataSubscription } from "../app/src/f-db"
+import { Data, DataSubscription, DataCollection } from "../app/src/f-db"
 import delay from "delay"
 
 
@@ -82,6 +82,19 @@ describe("Data", () => {
 
 
 describe("DataSubscription", () => {
+  test('Data support', () => {
+    new DataSubscription(new Data(2), (e) => {
+      expect(e).toBe(2)
+    })
+  })
+
+  test('DataCollection support', () => {
+    new DataSubscription(new DataCollection(new Data(1), new Data("2")), (...a) => {
+      expect(a).toEqual([1, "2"])
+    })
+  })
+
+
   test('Inital activation', () => {
     (() => {
       let data1 = new Data(2)
@@ -288,4 +301,30 @@ describe("DataSubscription", () => {
     d.set(23)
   })
     
+})
+
+
+describe("DataCollection", () => {
+  test("Data support", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+
+    let d = new DataCollection(d1, d2)
+    d.get((...a) => {
+      expect(a).toEqual([1, 2])
+    })
+  })
+
+  test("DataCollection support", () => {
+    let d1 = new Data(1)
+    let d2 = new Data("2")
+    let dd = new DataCollection(d1, d2)
+    let d3 = new Data(3)
+    let d4 = new Data("4")
+
+    let ddd = new DataCollection(dd, d3, d4)
+    ddd.get((...a) => {
+      expect(a).toEqual([[1, "2"], 3, "4"])
+    })
+  })
 })
