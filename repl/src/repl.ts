@@ -1,4 +1,4 @@
-import { Data, DataCollection } from "../../app/src/f-db"
+import { Data, DataCollection, DataSubscription } from "../../app/src/f-db"
 import delay from "delay"
 
 
@@ -11,7 +11,12 @@ col.get((e, w) => {
   console.log(e, w)
 })
 
-let r = {
-  a: 2
+e.set("world")
+w.set(3)
+
+let subs = (e: number) => {
+
 }
+
+let s = new DataSubscription(w, subs)
 
