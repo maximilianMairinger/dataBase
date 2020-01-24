@@ -18,7 +18,7 @@ let subs = (e: number) => {
 
 }
 
-let s = new DataSubscription(col, (a, b) => {
-
+let s = new DataSubscription(e, (a) => {
+  
 })
 

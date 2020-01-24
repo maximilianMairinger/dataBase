@@ -129,9 +129,9 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
   private _data: ConcreteData
 
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
-  // constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
-  // constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: false)
-  // constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
+  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: false)
+  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
   constructor(data: Data<TupleValue> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<TupleValue>, activate: boolean = true, inititalize: boolean = true) {
     //@ts-ignore
     this._data = data
