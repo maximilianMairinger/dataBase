@@ -1,24 +1,11 @@
 import { Data, DataCollection, DataSubscription } from "../../app/src/f-db"
-import delay from "delay"
 
 
-let e = new Data("hello")
-let w = new Data(2)
-
-let col = new DataCollection(e, w)
-
-col.get((e, w) => {
-  console.log(e, w)
-})
-
-e.set("world")
-w.set(3)
-
-let subs = (e: number) => {
-
-}
-
-let s = new DataSubscription(e, (a) => {
+let data1 = new Data(4)
+let subscription1 = (e) => {
+  fail()
   
-})
+} 
+let d = new DataSubscription(data1, subscription1, true, false)
 
+data1.set(3)

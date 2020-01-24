@@ -37,7 +37,7 @@ export class Data<Values extends [Value], Value = Values[0]> {
   public set(value: Value, wait: boolean = false): Value | Promise<Value> {
     if (value === this.value) return value
     this.value = value
-    if (wait) {
+    if (!wait) {
       for (let subscription of this.subscriptions) {
         subscription(value)
       }
@@ -141,8 +141,8 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
     this.active(activate, inititalize)
   }
 
-  public acivate(initialize: boolean = true): this {
-    if (this._active) return
+  public activate(initialize: boolean = true): this {
+    if (this._active) return this
     this._active = true
     //@ts-ignore
     this._data.subscribe(this._subscription, initialize)
@@ -150,17 +150,20 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
   }
 
   public deacivate(): this {
-    if (!this._active) return
+    if (!this._active) return this
     this._active = false
     //@ts-ignore
     this._data.got(this._subscription)
     return this
   }
 
+  public active(): boolean
   public active(activate: false): this
   public active(activate: true, initialize?: boolean): this
-  public active(activate: boolean, initialize?: boolean): this {
-    if (activate) this.acivate(initialize)
+  public active(activate: boolean, initialize?: boolean): this
+  public active(activate?: boolean, initialize?: boolean): this | boolean {
+    if (activate === undefined) return this._active
+    if (activate) this.activate(initialize)
     else this.deacivate()
     return this
   }
@@ -172,9 +175,10 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
     if (data == undefined) return this._data
     else {
       let isActive = this.active
+      let prevData = this._data.get()
       this.deacivate()
       this._data = data
-      if (isActive) this.acivate()
+      if (isActive) this.activate(prevData !== data.get())
       return this
     }
   }
@@ -187,7 +191,7 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
       let isActive = this.active
       this.deacivate()
       this._subscription = subscription
-      if (isActive) this.acivate()
+      if (isActive) this.activate(initialize)
       return this
     }
   }
