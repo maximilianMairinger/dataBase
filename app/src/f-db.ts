@@ -64,7 +64,7 @@ type DataSetify<T extends any[]> = {
 
 
 
-class DataCollection<Values extends any[], Value extends Values[number] = Values[number]> {
+export class DataCollection<Values extends any[], Value extends Values[number] = Values[number]> {
   private subscriptions: Subscription<Values>[] = []
   //@ts-ignore
   private datas: DataSetify<Values> = []
@@ -123,7 +123,7 @@ class DataCollection<Values extends any[], Value extends Values[number] = Values
 
 
 
-class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values> = ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values>> {
+export class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values> = ConcreteData extends Data<[Values[0]]> ? Subscription<[Values[0]]> : Subscription<Values>> {
   private _active: boolean = false
 
   private _subscription: ConcreteSubscription
@@ -133,7 +133,8 @@ class DataSubscription<Values extends any[], ConcreteData extends DataSet<Values
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
   constructor(data: Data<[Values[0]]>, subscription: Subscription<[Values[0]]>, activate?: false)
   constructor(data: Data<[Values[0]]>, subscription: Subscription<[Values[0]]>, activate?: true, inititalize?: boolean)
-  constructor(data: ConcreteData, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate?: boolean, inititalize?: boolean) {
+  constructor(data: Data<[Values[0]]> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate: boolean = true, inititalize: boolean = true) {
+    //@ts-ignore
     this._data = data
     //@ts-ignore
     this._subscription = _subscription

@@ -1,24 +1,17 @@
-import { Data } from "../../app/src/f-db"
+import { Data, DataCollection } from "../../app/src/f-db"
 import delay from "delay"
 
 
-let me = new Data("hello")
+let e = new Data("hello")
+let w = new Data(2)
 
-console.log(me)
+let col = new DataCollection(e,w)
 
-let s = (e) => {
-  console.log(e)
+col.get((e, w) => {
+  console.log(e, w)
+})
+
+let r = {
+  a: 2
 }
-
-let e = me.get(s)
-
-me.set("4")
-me.set("4")
-
-me.got(s)
-
-
-me.set("4")
-
-
 

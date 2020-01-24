@@ -1,4 +1,4 @@
-import { Data } from "../app/src/f-db"
+import { Data, DataSubscription } from "../app/src/f-db"
 import 'jest-extended';
 
 
@@ -77,5 +77,6 @@ test('Dont notify when set value doesnt change', () => {
 
   d.set(2)
 })
+
 
 
