@@ -32,24 +32,74 @@ describe("Data", () => {
   })
   
   
-  test('Unsunscription', () => {
+  test('Unsubscribe Vanilla', () => {
     let d = new Data(2)
   
+    let i = 0
+    expect.assertions(3)
     let f = (e) => {
-      expect(e).toBe(4)
+      i++
+      if (i === 1) expect(e).toBe(4)
+      else if (i === 2) expect(e).toBe(2)
+      else if (i === 3) expect(e).toBe(4)
+      else if (i === 4) fail()
     }
   
     d.get(f, false)
     d.set(4)
     d.got(f)
+    d.set(123)
+    d.set(321)
+    d.set(321)
+    d.get(f, false)
+    d.set(2)
+    d.set(2)
+    d.got(f)
+    d.set(4)
+    d.get(f)
+    d.set(4)
+    d.got(f)
+    d.set(312)
   })
+
+  test('Unsubscribe DataSubscription', () => {
+    let d = new Data(2)
+  
+    let i = 0
+    expect.assertions(3)
+    let f = d.get((e) => {
+      i++
+      if (i === 1) expect(e).toBe(4)
+      else if (i === 2) expect(e).toBe(2)
+      else if (i === 3) expect(e).toBe(4)
+      else if (i === 4) fail()
+    }, false)
+
+
+    d.set(4)
+    d.got(f)
+    d.set(123)
+    d.set(321)
+    d.set(321)
+    d.get(f, false)
+    d.set(2)
+    d.set(2)
+    d.got(f)
+    d.set(4)
+    d.get(f)
+    d.set(4)
+    d.got(f)
+    d.set(312)
+  })
+
   
   
   test('Subscription value change', () => {
     let d = new Data(2)
   
+
+    expect.assertions(3)
     let i = 0
-  
     d.get((e) => {
       i++
       if (i === 1) {
@@ -208,6 +258,8 @@ describe("DataSubscription", () => {
 
   test("Active state change", () => {
     let d = new Data(4)
+
+    expect.assertions(5)
     let i = 0
     let subscription1 = (e) => {
       i++
@@ -255,6 +307,8 @@ describe("DataSubscription", () => {
 
   test("Subscription change", () => {
     let d = new Data(4)
+
+    expect.assertions(3)
     let subscription1 = (e) => {
       expect(e).toBe(4)
     } 
@@ -278,12 +332,15 @@ describe("DataSubscription", () => {
   test("Data change", () => {
     let d = new Data(4)
     let i = 0
+
+    expect.assertions(4)
     let subscription1 = (e) => {
       i++
       if (i === 1) expect(e).toBe(4)
       else if (i === 2) expect(e).toBe(6)
       else if (i === 3) expect(e).toBe(7)
-      else if (i === 4) fail()
+      else if (i === 4) expect(e).toBe(23)
+      else if (i === 5) fail()
     }
     let s = new DataSubscription(d, subscription1)
 
@@ -295,12 +352,53 @@ describe("DataSubscription", () => {
     d2.set(6)
     d2.set(6)
     d2.set(7)
+    s.data(d)
+    d2.set(231321)
+    d2.set(23)
+    d2.set(23)
+    d.set(23)
+    d.set(23)
+    d2.set(23)
     s.data(d2)
-    d.set(231321)
-    d.set(23)
-    d.set(23)
   })
-    
+
+
+  test("Multiple instances of same DataSet & Subsciption active coherence", () => {
+    let d = new Data(4)
+
+    expect.assertions(5)
+    let i = 0
+    let subscription1 = (e) => {
+      i++
+      if (i === 1) expect(e).toBe(4)
+      else if (i === 2) expect(e).toBe(4)
+      else if (i === 3) expect(e).toBe(5)
+      else if (i === 4) expect(e).toBe(6)
+      else if (i === 5) expect(e).toBe(2)
+      else if (i === 6) fail()
+    } 
+    let s1 = new DataSubscription(d, subscription1)
+    let s2 = new DataSubscription(d, subscription1)
+
+    s1.active(false)
+    d.set(123)
+    s2.active(false)
+    d.set(4)
+    s2.active(true)
+    s2.activate()
+    s2.activate()
+    d.set(5)
+    s1.deacivate()
+    s1.deacivate()
+    s1.active(false)
+    d.set(6)
+    s1.active(!s2.active())
+    s2.deacivate()
+    d.set(0)
+    d.set(2)
+    s1.activate()
+    d.set(2)
+  })
 })
 
 
@@ -326,5 +424,113 @@ describe("DataCollection", () => {
     ddd.get((...a) => {
       expect(a).toEqual([[1, "2"], 3, "4"])
     })
+  })
+
+  test("Dont Initialize", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+
+    let d = new DataCollection(d1, d2)
+    d.get((...a) => {
+      fail()
+    }, false)
+  })
+
+  test("Current Value", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+    let d3 = new Data("333")
+
+    let d = new DataCollection(d1, d2, d3)
+    expect(d.get()).toEqual([1, 2, "333"])
+  })
+
+  test("Subscription any value change", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+
+    let d = new DataCollection(d1, d2)
+
+    let i = 0
+    expect.assertions(3)
+    d.get((...a) => {
+      i++
+      if (i === 1) {
+        expect(a).toEqual([1, 2])
+      }
+      else if (i === 2) {
+        expect(a).toEqual([100, 2])
+      }
+      else if (i === 3) {
+        expect(a).toEqual([100, 20])
+      }
+    })
+
+
+    d1.set(100)
+    d2.set(20)
+  })
+
+  test("Unsubscribe Vanilla", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+
+    let d = new DataCollection(d1, d2)
+
+    let i = 0
+    expect.assertions(2)
+    let f = (...a) => {
+      i++
+      if (i === 1) {
+        expect(a).toEqual([1, 2])
+      }
+      else if (i === 2) {
+        expect(a).toEqual([100, 2])
+      }
+      else if (i === 3) {
+        fail()
+      }
+    }
+
+    d.get(f)
+
+
+    d1.set(100)
+    d.got(f)
+    d1.set(2000)
+    d2.set(2000)
+  })
+
+  test("Unsubscribe via DataSubscription", () => {
+    let d1 = new Data(1)
+    let d2 = new Data(2)
+
+    let d = new DataCollection(d1, d2)
+
+    expect.assertions(3)
+    let i = 0
+    let me = d.get((...a) => {
+      i++
+      if (i === 1) {
+        expect(a).toEqual([1, 2])
+      }
+      else if (i === 2) {
+        expect(a).toEqual([100, 2])
+      }
+      else if (i === 3) {
+        expect(a).toEqual([1000, 2000])
+      }
+      else if (i === 4) {
+        fail()
+      }
+    })
+
+
+    d1.set(100)
+    d.got(me)
+    d1.set(2000)
+    d2.set(2000)
+    d.get(me, false)
+    d1.set(1000)
   })
 })
