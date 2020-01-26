@@ -1,4 +1,4 @@
-import { Data, DataCollection, DataSubscription } from "../../app/src/f-db"
+import { Data, DataCollection, DataSubscription, DataBase } from "../../app/src/f-db"
 
 
 let data1 = new Data(4)
