@@ -3,7 +3,7 @@ type Subscription<Values extends any[]> = (...value: Values) => void | Promise<v
 
 
 
-export class Data<Values extends [Value], Value = Values[0]> {
+export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
   private value: Value
   private subscriptions: Subscription<[Value]>[] = []
 
@@ -12,8 +12,8 @@ export class Data<Values extends [Value], Value = Values[0]> {
   }
 
   public get(): Value
-  public get(subscription: Subscription<Values> | DataSubscription<Values>, initialize?: boolean): DataSubscription<Values>
-  public get(subscription?: Subscription<Values> | DataSubscription<Values>, initialize: boolean = true): Value | DataSubscription<Values> {
+  public get(subscription: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>, initialize?: boolean): DataSubscription<TuplifiedValue>
+  public get(subscription?: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>, initialize: boolean = true): Value | DataSubscription<TuplifiedValue> {
     if (subscription === undefined) return this.value
     else {
       if (subscription instanceof DataSubscription) return subscription.activate(initialize)
@@ -21,20 +21,20 @@ export class Data<Values extends [Value], Value = Values[0]> {
     }
   }
 
-  private isSubscribed(subscription: Subscription<Values>) {
+  private isSubscribed(subscription: Subscription<TuplifiedValue>) {
     return this.subscriptions.includes(subscription)
   }
-  private unsubscribe(subscription: Subscription<Values>) {
+  private unsubscribe(subscription: Subscription<TuplifiedValue>) {
     this.subscriptions.rmV(subscription)
   }
-  private subscribe(subscription: Subscription<Values>, initialize: boolean) {
+  private subscribe(subscription: Subscription<TuplifiedValue>, initialize: boolean) {
     this.subscriptions.add(subscription)
     //@ts-ignore
     if (initialize) return subscription(this.value)
   }
 
   // TODO return true when successfull
-  public got(subscription: Subscription<Values> | DataSubscription<Values>): DataSubscription<Values> {
+  public got(subscription: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>): DataSubscription<TuplifiedValue> {
     return (subscription instanceof DataSubscription) ? subscription.deacivate()
     : new DataSubscription(this, subscription, false)
   }
@@ -63,7 +63,7 @@ export class Data<Values extends [Value], Value = Values[0]> {
 }
 
 
-export type DataSet<Values extends any[]> = Data<[Values[0]]> | DataCollection<Values[number]>
+export type DataSet<Values extends any[]> = Data<Values[0]> | DataCollection<Values[number]>
 
 type DataSetify<T extends any[]> = { 
   [P in keyof T]: DataSet<[T[P]]>
@@ -141,16 +141,16 @@ export class DataCollection<Values extends any[], Value extends Values[number] =
 
 
 
-export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[number]], Value = TupleValue[0], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values> = ConcreteData extends Data<TupleValue> ? Subscription<TupleValue> : Subscription<Values>> {
+export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[number]], Value = TupleValue[0], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<Value> ? Subscription<TupleValue> : Subscription<Values> = ConcreteData extends Data<Value> ? Subscription<TupleValue> : Subscription<Values>> {
 
   private _subscription: ConcreteSubscription
   private _data: ConcreteData
 
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
-  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: false)
-  constructor(data: Data<TupleValue>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
-  constructor(data: Data<TupleValue> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<TupleValue>, activate: boolean = true, inititalize: boolean = true) {
+  constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: false)
+  constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
+  constructor(data: Data<Value> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<TupleValue>, activate: boolean = true, inititalize: boolean = true) {
     //@ts-ignore
     this._data = data
     //@ts-ignore
@@ -215,4 +215,5 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
     }
   }
 }
+
 
