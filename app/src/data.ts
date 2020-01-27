@@ -60,6 +60,10 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
       })()
     }
   }
+
+  public toString() {
+    return "Data: " + this.value
+  }
 }
 
 
