@@ -9,6 +9,7 @@
   },
   "exclude": [
     "./test",
+    "./repl",
     "./app/dist"
   ]
 }
