@@ -45,7 +45,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "xrray": "^4.4.0"
+    "xrray": "^4.6.1"
   },
   "sideEffects": false
 }
