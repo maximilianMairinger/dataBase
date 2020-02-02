@@ -9,22 +9,35 @@ const bodyOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFuncti
 
 class InternalDataBase<Store extends object, Matcher, Class extends JSONMatcherClass<Matcher>, ExtendedStore extends JSONMatch<Store, Matcher, Class>> extends Function {
   private t: any
+
+  private rawStore: Store
+  private match: Matcher
+  private jsonMatcherClass: Class
+  private store: ExtendedStore
   constructor(store: Store, match: Matcher, jsonMatcherClass: Class) {
     super(paramsOfDataBaseFunction, bodyOfDataBaseFunction)
     this.t = this.bind(this)
 
-    this.t.rawStore = store
-    this.t.match = match
-    this.t.jsonMatcherClass = jsonMatcherClass
+    this.rawStore = store
+    this.match = match
+    this.jsonMatcherClass = jsonMatcherClass
 
     // TODO: ExtendedStore in runtime
 
     
-    this.initData()
+    this.attatchDataToFunction()
+    this.buildExtenedStore()
 
     
-
     return this.t
+  }
+
+  private buildExtenedStore() {
+    
+  }
+
+  private buildExtentionRec() {
+
   }
 
   public change() {
@@ -34,12 +47,12 @@ class InternalDataBase<Store extends object, Matcher, Class extends JSONMatcherC
     }
   }
 
-  private initData() {
+  private attatchDataToFunction() {
     const t = this.t
-    const data = t.data
+    const data = this.rawStore
     for (const key in data) {
       const val = data[key]
-      if (typeof val === objectString) t[key] = new InternalDataBase(val, t.match, t.jsonMatcherClass)
+      if (typeof val === objectString) t[key] = new InternalDataBase(val as any, t.match, t.jsonMatcherClass)
       else t[key] = new Data(val)
     }
   }
