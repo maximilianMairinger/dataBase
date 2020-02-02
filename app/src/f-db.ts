@@ -2,10 +2,11 @@
 // DataBase which contains a komplex (not primitiv types = objects)
 // map off Observables as is often given when requesting data (e.g. JSON).
 
-import * as xrray from "xrray"
-xrray(Array)
+import Xrray from "xrray"
+Xrray(Array)
 
-const {InvalidValueException} = xrray;
+//@ts-ignore
+const {InvalidValueException} = Xrray;
 
 
 export class InvalidKey extends Error {
