@@ -95,7 +95,7 @@ type DataBaseify<Type extends object, Matcher, Class extends JSONMatcherClass<Ma
 
 type DataBase<Type extends object, Matcher, Class extends JSONMatcherClass<Matcher>> = OmitFunctionProperties<Function> & DataBaseify<Type, Matcher, Class> & JSONMatcher<Matcher, Class>
 //@ts-ignore
-export const DataBase = InternalDataBase as { new<Type extends object>(data: Type): DataBase<Type> }
+export const DataBase = InternalDataBase as { new<Type extends object, Matcher>(data: Type): DataBase<Type, Matcher, JSONMatcherClass<Matcher>> }
 
 
 type JSONMatch<Type extends object, Matcher, Class extends JSONMatcherClass<Matcher>> = { 
