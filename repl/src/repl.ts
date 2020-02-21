@@ -1,4 +1,5 @@
 import { Data, DataCollection, DataSubscription, DataBase } from "../../app/src/f-db"
+import clone from "tiny-clone"
 
 
 // class TestMatcher<Matcher extends 2> extends JSONMatcherClass<Matcher> {
@@ -12,18 +13,12 @@ import { Data, DataCollection, DataSubscription, DataBase } from "../../app/src/
 
 
 
-let db = new DataBase({ok: 2})
+let db = new DataBase({nested: {inner: "www"}})
 
-db({ok: 33})
 
-db.ok.get((k) => {
-  console.log(k)
+db((e) => {
+  console.log(clone(e))
 })
 
 
-db({ok: 34})
-let db2 = db({ok: 35, ww: 2})
-
-
-
-console.log(db2.ww.get())
+db.nested.inner.set("eee")

@@ -45,6 +45,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "tiny-clone": "^1.0.0",
     "xrray": "^4.6.1"
   },
   "sideEffects": false
