@@ -37,6 +37,12 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
     : new DataSubscription(this, subscription, false)
   }
 
+  private destroy() {
+    for (const key in this) {
+      delete this[key]
+    }
+  }
+
   public set(value: Value): Value
   public set(value: Value, wait: false): Value
   public set(value: Value, wait: true): Promise<Value>

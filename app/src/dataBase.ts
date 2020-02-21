@@ -1,9 +1,7 @@
 import { Data, DataSubscription, DataCollection, DataSet } from "./data"
 import { nthIndex } from "./helper"
 
-const entireDataBaseFunction = DataBaseFunction.toString(); 
-const paramsOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFunction.indexOf("(") + 1, nthIndex(entireDataBaseFunction, ")", 1));
-const bodyOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFunction.indexOf("{") + 1, entireDataBaseFunction.lastIndexOf("}"));
+
 
 
 
@@ -16,27 +14,69 @@ class InternalDataBase<Store extends object> extends Function {
     super(paramsOfDataBaseFunction, bodyOfDataBaseFunction)
     this.t = this.bind(this)
 
+    this.rawStore = store
+
     
     this.attatchDataToFunction()
-    this.buildExtenedStore()
+    
 
     
     return this.t
   }
 
-  private buildExtenedStore() {
-    
-  }
-
-  private buildExtentionRec() {
-
-  }
-
-  public change() {
-    const t = this.t
-    for (let key in t) {
-      t[key]
+  private destroy() {
+    for (const key in this.t) {
+      this.t[key].destory()
+      delete this.t[key]
     }
+    for (const key in this) {
+      //@ts-ignore
+      delete this[key]
+    }
+  }
+
+  private DataBaseFunctionWrapper(...a) {
+    this.DataBaseFunction(...a)
+  }
+
+
+  private DataBaseFunction(...paths: PathSegment[]): any
+  private DataBaseFunction<NewStore extends ComplexData>(data: NewStore): DataBase<NewStore & Store>
+  private DataBaseFunction(path_data?: PathSegment | ComplexData, ...paths: PathSegment[]): any {
+    const t = this.t
+    if (!(path_data instanceof Data || path_data instanceof DataCollection)) {
+      let data = path_data as ComplexData
+  
+      for (const key in data) {
+        const inner = t[key]
+        const val = data[key]
+        if (inner !== undefined) {
+          if (inner instanceof Data) {
+            if (typeof val !== "object") inner.set(val)
+            else {
+              (inner as any).destory()
+              t[key] = new DataBase(val as any)
+            }
+          }
+          else {
+            if (typeof val === "object") inner(val)
+            else {
+              (inner as any).destory()
+              t[key] = new Data(val)
+            }
+          }
+        }
+        else {
+          if (typeof val === "object") t[key] = new DataBase(val)
+          else t[key] = new Data(val)
+        }
+      }
+      return this
+    }
+    else {
+  
+    }
+    
   }
 
   private attatchDataToFunction() {
@@ -44,27 +84,31 @@ class InternalDataBase<Store extends object> extends Function {
     const data = this.rawStore
     for (const key in data) {
       const val = data[key]
-      if (typeof val === objectString) t[key] = new InternalDataBase(val as any)
-      else t[key] = new Data(val)
+      if (!(val instanceof Data || val instanceof DataBase)) {
+        if (typeof val === objectString) t[key] = new DataBase(val as any)
+        else t[key] = new Data(val)
+      }
     }
   }
 }
+
+
+//@ts-ignore
+const entireDataBaseFunction = InternalDataBase.prototype.DataBaseFunctionWrapper.toString(); 
+const paramsOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFunction.indexOf("(") + 1, nthIndex(entireDataBaseFunction, ")", 1));
+const bodyOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFunction.indexOf("{") + 1, entireDataBaseFunction.lastIndexOf("}"));
+console.log(entireDataBaseFunction)
+console.log(paramsOfDataBaseFunction)
+console.log(bodyOfDataBaseFunction)
 
 
 const objectString: "object" = "object"
 
 
 type PrimitivePathSegment = string | number
-type PathSegment = PrimitivePathSegment | Data<[PrimitivePathSegment]>
-type ComplexData = {[key: string]: any} | any[]
+type PathSegment = PrimitivePathSegment | DataSet<[PrimitivePathSegment]>
+type ComplexData = {[key: string]: any}
 
-function DataBaseFunction(...paths: PathSegment[])
-function DataBaseFunction(data: ComplexData)
-function DataBaseFunction(path_data?: PathSegment | ComplexData, ...paths: PathSegment[]) {
-
-
-  console.log(this.t.data)
-}
 
 
 
@@ -74,7 +118,7 @@ type DataBaseify<Type extends object> = {
   [Key in keyof Type]: Type[Key] extends object ? DataBase<Type[Key]> : Data<Type[Key]>
 }
 
-type DataBase<Type extends object> = OmitFunctionProperties<Function> & DataBaseify<Type>
+type DataBase<Store extends object> = OmitFunctionProperties<InternalDataBase<Store>["DataBaseFunction"]> & DataBaseify<Store>
 
 //@ts-ignore
 export const DataBase = InternalDataBase as ({ new<Store extends object>(store: Store): DataBase<Store> } )

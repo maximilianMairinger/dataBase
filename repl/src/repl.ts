@@ -12,11 +12,18 @@ import { Data, DataCollection, DataSubscription, DataBase } from "../../app/src/
 
 
 
+let db = new DataBase({ok: 2})
 
-let d = new Data("ok")
+db({ok: 33})
 
-d.get((e) => {
-
+db.ok.get((k) => {
+  console.log(k)
 })
 
 
+db({ok: 34})
+let db2 = db({ok: 35, ww: 2})
+
+
+
+console.log(db2.ww.get())
