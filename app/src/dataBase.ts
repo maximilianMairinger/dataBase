@@ -7,22 +7,14 @@ const bodyOfDataBaseFunction = entireDataBaseFunction.slice(entireDataBaseFuncti
 
 
 
-class InternalDataBase<Store extends object, Matcher, Class extends JSONMatcherClass<Matcher>, ExtendedStore extends JSONMatch<Store, Matcher, Class>> extends Function {
+class InternalDataBase<Store extends object> extends Function {
   private t: any
 
   private rawStore: Store
-  private match: Matcher
-  private jsonMatcherClass: Class
-  private store: ExtendedStore
-  constructor(store: Store, match: Matcher, jsonMatcherClass: Class) {
+
+  constructor(store: Store) {
     super(paramsOfDataBaseFunction, bodyOfDataBaseFunction)
     this.t = this.bind(this)
-
-    this.rawStore = store
-    this.match = match
-    this.jsonMatcherClass = jsonMatcherClass
-
-    // TODO: ExtendedStore in runtime
 
     
     this.attatchDataToFunction()
@@ -52,7 +44,7 @@ class InternalDataBase<Store extends object, Matcher, Class extends JSONMatcherC
     const data = this.rawStore
     for (const key in data) {
       const val = data[key]
-      if (typeof val === objectString) t[key] = new InternalDataBase(val as any, t.match, t.jsonMatcherClass)
+      if (typeof val === objectString) t[key] = new InternalDataBase(val as any)
       else t[key] = new Data(val)
     }
   }
@@ -75,39 +67,15 @@ function DataBaseFunction(path_data?: PathSegment | ComplexData, ...paths: PathS
 }
 
 
-class JSONMatcher<Matcher, Class extends JSONMatcherClass<Matcher>> {
-  constructor(public matcher: Matcher, public cls: Class) {
-
-  }
-}
-
-class JSONMatcherClass<Matcher> {
-  constructor(protected data: Matcher) {
-
-  }
-}
 
 type FunctionProperties = "apply" | "call" | "caller" | "bind" | "arguments" | "length" | "prototype" | "name" | "toString"
 type OmitFunctionProperties<Func extends Function> = Func & Record<FunctionProperties, never>
-type DataBaseify<Type extends object, Matcher, Class extends JSONMatcherClass<Matcher>> = { 
-  [Key in keyof Type]: Type[Key] extends object ? DataBase<Type[Key], Matcher, Class> : Data<Type[Key]>
+type DataBaseify<Type extends object> = { 
+  [Key in keyof Type]: Type[Key] extends object ? DataBase<Type[Key]> : Data<Type[Key]>
 }
 
-type DataBase<Type extends object, Matcher, Class extends JSONMatcherClass<Matcher>> = OmitFunctionProperties<Function> & DataBaseify<Type, Matcher, Class> & JSONMatcher<Matcher, Class>
+type DataBase<Type extends object> = OmitFunctionProperties<Function> & DataBaseify<Type>
+
 //@ts-ignore
-export const DataBase = InternalDataBase as { new<Type extends object, Matcher>(data: Type): DataBase<Type, Matcher, JSONMatcherClass<Matcher>> }
-
-
-type JSONMatch<Type extends object, Matcher, Class extends JSONMatcherClass<Matcher>> = { 
-  [Key in keyof Type]: Type[Key] extends Matcher ? Type[Key] extends object ? JSONMatch<Type[Key], Matcher, Class> & Class : Type[Key] & Class : Type[Key] extends object ? JSONMatch<Type[Key], Matcher, Class> : Type[Key]
-}
-
-class Test<Matcher> extends JSONMatcherClass<Matcher> {
-  constructor(data: Matcher) {
-    super(data)
-  }
-  ok() {
-    return this.data
-  }
-}
+export const DataBase = InternalDataBase as ({ new<Store extends object>(store: Store): DataBase<Store> } )
 

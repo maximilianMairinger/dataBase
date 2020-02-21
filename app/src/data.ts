@@ -1,8 +1,6 @@
 type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
-
-
 export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
   private value: Value
   private subscriptions: Subscription<[Value]>[] = []
@@ -12,7 +10,7 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
   }
 
   public get(): Value
-  public get(subscription: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>, initialize?: boolean): DataSubscription<TuplifiedValue>
+  public get(subscription: Subscription<[Value]> | DataSubscription<[Value]>, initialize?: boolean): DataSubscription<TuplifiedValue>
   public get(subscription?: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>, initialize: boolean = true): Value | DataSubscription<TuplifiedValue> {
     if (subscription === undefined) return this.value
     else {
@@ -72,8 +70,6 @@ export type DataSet<Values extends any[]> = Data<Values[0]> | DataCollection<Val
 type DataSetify<T extends any[]> = { 
   [P in keyof T]: DataSet<[T[P]]>
 }
-
-
 
 
 export class DataCollection<Values extends any[], Value extends Values[number] = Values[number]> {

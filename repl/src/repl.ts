@@ -1,12 +1,22 @@
 import { Data, DataCollection, DataSubscription, DataBase } from "../../app/src/f-db"
 
 
-let db = new DataBase({a: {b: 2}, c: "5"})
+// class TestMatcher<Matcher extends 2> extends JSONMatcherClass<Matcher> {
 
-db.a.b.get()
+//   ok() {
+//     return this.data
+//   }
+// }
 
-console.log(db.a.b.get(), db instanceof DataBase)
+// let db = new DataBase({a: {b: 2}, c: "5"})
 
 
+
+
+let d = new Data("ok")
+
+d.get((e) => {
+
+})
 
 
