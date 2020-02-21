@@ -13,12 +13,8 @@ import clone from "tiny-clone"
 
 
 
-let db = new DataBase({nested: {inner: "www"}})
+let db = new DataBase({a: "aa", b: "bb"})
 
 
-db((e) => {
-  console.log(clone(e))
-})
-
-
-db.nested.inner.set("eee")
+let d = new Data<"a">("a")
+console.log(db(d).get())

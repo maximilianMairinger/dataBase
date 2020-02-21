@@ -56,7 +56,46 @@ class InternalDataBase<Store extends ComplexData> extends Function {
   private DataBaseFunction(subscription: (store: Store) => void, init: boolean): any
   private DataBaseFunction(path_data_subscription?: PathSegment | ComplexData | ((store: Store) => void), init_path?: PathSegment | boolean, ...paths: PathSegment[]): any {
     const t = this.t
+
     if (path_data_subscription instanceof Data || path_data_subscription instanceof DataCollection) {
+      let pathFragments = ([path_data_subscription]) as PathSegment[]
+      if (init_path !== undefined) pathFragments.add(init_path as PathSegment)
+      pathFragments.add(...paths)
+
+      let index = [this.t]
+
+      let f = (path: PathSegment, i: number) => {
+        i++
+        if (typeof path === "string" || typeof path === "number") {
+          index[i] = index.last[path]
+        }
+        else {
+          index[i] = index.last[path.get()]
+        }
+      }
+
+      pathFragments.ea(f)
+      pathFragments.ea((path, i) => {
+        if (path instanceof DataCollection || path instanceof Data) {
+          path.get(() => {
+            for (; i < pathFragments.length; i++) {
+              f(pathFragments[i], i)
+            }
+          }, false)
+        }
+      })
+    }
+    else if (typeof path_data_subscription === "function") {
+      let subscription = path_data_subscription as (store: Store) => void
+
+      if (init_path === undefined || init_path) subscription(this.store)
+      this.subscriptions.add(subscription)
+
+    }
+    else if (path_data_subscription === undefined) {
+      return this.store
+    }
+    else {
       let data = path_data_subscription as ComplexData
       
       
@@ -112,19 +151,6 @@ class InternalDataBase<Store extends ComplexData> extends Function {
         }
       }
       return t
-    }
-    else if (path_data_subscription instanceof Array) {
-      
-    }
-    else if (typeof path_data_subscription === "function") {
-      let subscription = path_data_subscription as (store: Store) => void
-
-      if (init_path === undefined || init_path) subscription(this.store)
-      this.subscriptions.add(subscription)
-
-    }
-    else if (path_data_subscription === undefined) {
-      return this.store
     }
     
   }
