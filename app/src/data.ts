@@ -1,7 +1,7 @@
 type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
-export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
+export class Data<Value> {
   private value: Value
   private subscriptions: Subscription<[Value]>[] = []
 
@@ -9,9 +9,11 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
     this.value = value
   }
 
+  
   public get(): Value
-  public get(subscription: Subscription<[Value]> | DataSubscription<[Value]>, initialize?: boolean): DataSubscription<TuplifiedValue>
-  public get(subscription?: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>, initialize: boolean = true): Value | DataSubscription<TuplifiedValue> {
+  public get(subscription: Subscription<[Value]>, initialize?: boolean): DataSubscription<[Value]>
+  public get(subscription: DataSubscription<[Value]>, initialize?: boolean): DataSubscription<[Value]>
+  public get(subscription?: Subscription<[Value]> | DataSubscription<[Value]>, initialize: boolean = true): Value | DataSubscription<[Value]> {
     if (subscription === undefined) return this.value
     else {
       if (subscription instanceof DataSubscription) return subscription.activate(initialize)
@@ -19,20 +21,20 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
     }
   }
 
-  private isSubscribed(subscription: Subscription<TuplifiedValue>) {
+  private isSubscribed(subscription: Subscription<[Value]>) {
     return this.subscriptions.includes(subscription)
   }
-  private unsubscribe(subscription: Subscription<TuplifiedValue>) {
+  private unsubscribe(subscription: Subscription<[Value]>) {
     this.subscriptions.rmV(subscription)
   }
-  private subscribe(subscription: Subscription<TuplifiedValue>, initialize: boolean) {
+  private subscribe(subscription: Subscription<[Value]>, initialize: boolean) {
     this.subscriptions.add(subscription)
     //@ts-ignore
     if (initialize) return subscription(this.value)
   }
 
   // TODO return true when successfull
-  public got(subscription: Subscription<TuplifiedValue> | DataSubscription<TuplifiedValue>): DataSubscription<TuplifiedValue> {
+  public got(subscription: Subscription<[Value]> | DataSubscription<[Value]>): DataSubscription<[Value]> {
     return (subscription instanceof DataSubscription) ? subscription.deacivate()
     : new DataSubscription(this, subscription, false)
   }
@@ -69,6 +71,7 @@ export class Data<Value, TuplifiedValue extends [Value] = [Value]> {
     return "Data: " + this.value
   }
 }
+
 
 
 export type DataSet<Values extends any[]> = Data<Values[0]> | DataCollection<Values[number]>
