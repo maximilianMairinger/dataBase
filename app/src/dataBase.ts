@@ -58,32 +58,31 @@ class InternalDataBase<Store extends ComplexData> extends Function {
     const t = this.t
 
     if (path_data_subscription instanceof Data || path_data_subscription instanceof DataCollection) {
-      let pathFragments = ([path_data_subscription]) as PathSegment[]
-      if (init_path !== undefined) pathFragments.add(init_path as PathSegment)
-      pathFragments.add(...paths)
 
-      let index = [this.t]
+      let sym = Symbol()
+      let erg: any
 
-      let f = (path: PathSegment, i: number) => {
-        i++
-        if (typeof path === "string" || typeof path === "number") {
-          index[i] = index.last[path]
-        }
-        else {
-          index[i] = index.last[path.get()]
-        }
+      let path: PathSegment = path_data_subscription
+
+      if (typeof path === "string" || typeof path === "number") {
+        erg = t[path]
+
+      }
+      else {
+        path.get((path) => {
+          erg = t[path]
+          erg[sym] = path
+        })
+        
+
       }
 
-      pathFragments.ea(f)
-      pathFragments.ea((path, i) => {
-        if (path instanceof DataCollection || path instanceof Data) {
-          path.get(() => {
-            for (; i < pathFragments.length; i++) {
-              f(pathFragments[i], i)
-            }
-          }, false)
-        }
-      })
+
+
+      
+
+      if (init_path === undefined) return erg
+      else return erg([init_path, ...paths])
     }
     else if (typeof path_data_subscription === "function") {
       let subscription = path_data_subscription as (store: Store) => void
