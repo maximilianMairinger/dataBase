@@ -1,4 +1,4 @@
-type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
+export type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
 export class Data<Value> {
@@ -17,7 +17,7 @@ export class Data<Value> {
     if (subscription === undefined) return this.value
     else {
       if (subscription instanceof DataSubscription) return subscription.activate(initialize)
-      else return new DataSubscription(this, subscription, true, initialize)
+      else return new DataSubscription(this as any as {subscribe: (subscription: Subscription<[Value]>, initialize?: boolean) => void, unsubscribe: (subscription: Subscription<[Value]>) => void, get: () => [Value], isSubscribed: (subscription: Subscription<[Value]>) => boolean}, subscription, true, initialize)
     }
   }
 
@@ -36,7 +36,7 @@ export class Data<Value> {
   // TODO return true when successfull
   public got(subscription: Subscription<[Value]> | DataSubscription<[Value]>): DataSubscription<[Value]> {
     return (subscription instanceof DataSubscription) ? subscription.deacivate()
-    : new DataSubscription(this, subscription, false)
+    : new DataSubscription(this as any as {subscribe: (subscription: Subscription<[Value]>, initialize?: boolean) => void, unsubscribe: (subscription: Subscription<[Value]>) => void, get: () => [Value], isSubscribed: (subscription: Subscription<[Value]>) => boolean}, subscription, false)
   }
 
   private destroy() {
@@ -74,7 +74,7 @@ export class Data<Value> {
 
 
 
-export type DataSet<Values extends any[]> = Data<Values[0]> | DataCollection<Values[number]>
+export type DataSet<Values extends any[]> = Data<Values[0]> | DataCollection<Values>
 
 type DataSetify<T extends any[]> = { 
   [P in keyof T]: DataSet<[T[P]]>
@@ -138,48 +138,47 @@ export class DataCollection<Values extends any[], Value extends Values[number] =
     if (subscription === undefined) return this.datas.Inner("get", [])
     else {
       if (subscription instanceof DataSubscription) return subscription.activate(initialize)
-      else return new DataSubscription(this, subscription, true, initialize)
+      else return new DataSubscription(this as any as {subscribe: (subscription: Subscription<Values>, initialize?: boolean) => void, unsubscribe: (subscription: Subscription<Values>) => void, get: () => Values, isSubscribed: (subscription: Subscription<Values>) => boolean}, subscription, true, initialize)
     }
   }
   public got(subscription: Subscription<Values> | DataSubscription<Values>): DataSubscription<Values> {
     return (subscription instanceof DataSubscription) ? subscription.deacivate()
-    : new DataSubscription(this, subscription, false)
+    : new DataSubscription(this as any as {subscribe: (subscription: Subscription<Values>, initialize?: boolean) => void, unsubscribe: (subscription: Subscription<Values>) => void, get: () => Values, isSubscribed: (subscription: Subscription<Values>) => boolean}, subscription, false)
   }
 
 } 
 
 
+type Subscribable<Values extends any[]> = {subscribe: (subscription: Subscription<Values>, initialize?: boolean) => void, unsubscribe: (subscription: Subscription<Values>) => void, get: () => Values, isSubscribed: (subscription: Subscription<Values>) => boolean}
 
-export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[number]], Value = TupleValue[0], ConcreteData extends DataSet<Values> = DataSet<Values>, ConcreteSubscription extends ConcreteData extends Data<Value> ? Subscription<TupleValue> : Subscription<Values> = ConcreteData extends Data<Value> ? Subscription<TupleValue> : Subscription<Values>> {
+export class DataSubscription<Values extends Value[], TupleValue extends [Value] = [Values[number]], Value = TupleValue[0], ConcreteData extends Subscribable<Values> = Subscribable<Values>, ConcreteSubscription extends Subscription<Values> = Subscription<Values>> {
 
   private _subscription: ConcreteSubscription
   private _data: ConcreteData
 
-  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
-  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+  constructor(data: Subscribable<Values>, subscription: Subscription<Values>, activate?: false)
+  constructor(data: Subscribable<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+
   constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: false)
   constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
-  constructor(data: Data<Value> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<TupleValue>, activate: boolean = true, inititalize: boolean = true) {
+  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
+  constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
+  constructor(data: Subscribable<Values> | Data<Values[0]> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate: boolean = true, inititalize: boolean = true) {
     //@ts-ignore
     this._data = data
     //@ts-ignore
     this._subscription = _subscription
-    //@ts-ignore
     this.active(activate, inititalize)
   }
 
   public activate(initialize: boolean = true): this {  
-    //@ts-ignore
     if (this.active()) return this
-    //@ts-ignore
     this._data.subscribe(this._subscription, initialize)
     return this
   }
 
   public deacivate(): this {
-    //@ts-ignore
     if (!this.active()) return this
-    //@ts-ignore
     this._data.unsubscribe(this._subscription)
     return this
   }
@@ -189,7 +188,6 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
   public active(activate: true, initialize?: boolean): this
   public active(activate: boolean, initialize?: boolean): this
   public active(activate?: boolean, initialize?: boolean): this | boolean {
-    //@ts-ignore
     if (activate === undefined) return this._data.isSubscribed(this._subscription)
     if (activate) this.activate(initialize)
     else this.deacivate()
@@ -200,7 +198,7 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
   public data(): ConcreteData
   public data(data: ConcreteData): this
   public data(data?: ConcreteData): ConcreteData | this {
-    if (data == undefined) return this._data
+    if (data === undefined) return this._data
     else {
       let isActive = this.active()
       let prevData = this._data.get()
