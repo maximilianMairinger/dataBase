@@ -1,3 +1,5 @@
+import { DataLink } from "./dataBase"
+
 export type Subscription<Values extends any[]> = (...value: Values) => void | Promise<void>
 
 
@@ -161,9 +163,11 @@ export class DataSubscription<Values extends Value[], TupleValue extends [Value]
 
   constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: false)
   constructor(data: Data<Value>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
+  constructor(data: DataLink<Value>, subscription: Subscription<TupleValue>, activate?: false)
+  constructor(data: DataLink<Value>, subscription: Subscription<TupleValue>, activate?: true, inititalize?: boolean)
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: false)
   constructor(data: DataCollection<Values>, subscription: Subscription<Values>, activate?: true, inititalize?: boolean)
-  constructor(data: Subscribable<Values> | Data<Values[0]> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate: boolean = true, inititalize: boolean = true) {
+  constructor(data: Subscribable<Values> | Data<Value> | DataLink<Value> | DataCollection<Values>, _subscription: Subscription<Values> | Subscription<[Values[0]]>, activate: boolean = true, inititalize: boolean = true) {
     //@ts-ignore
     this._data = data
     //@ts-ignore

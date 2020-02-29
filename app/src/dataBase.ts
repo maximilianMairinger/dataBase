@@ -1,8 +1,91 @@
-import { Data, DataSubscription, DataCollection, DataSet } from "./data"
+import { Data, DataSubscription, DataCollection, DataSet, Subscription } from "./data"
 import { nthIndex } from "./helper"
 import clone from "tiny-clone"
+import attatchToPrototype from "attatch-to-prototype"
 
 
+
+
+export class DataBaseLink<Store extends ComplexData> extends Function {
+  private t: any
+  private db: DataBase<Store>
+  constructor(db: DataBase<Store>) {
+    super(paramsOfDataBaseLinkFunction, bodyOfDataBaseLinkFunction)
+    this.t = this.bind(this)
+    this.db = db
+
+    this.attatchDataToFunction()
+
+    return this.t
+  }
+
+  private attatchDataToFunction() {
+    let attatch = attatchToPrototype(this.t)
+    
+    for (let key in this.db) {
+      attatch(key, { get: () => {
+        return this.db[key]
+      }, enumerable: true})
+    }
+  }
+
+  private DataBaseLinkFunction(...a: any[]) {
+    this.db(...a)
+  }
+
+  private DataBaseLinkFunctionWrapper(...a: any[]) {
+    this.DataBaseLinkFunction(...a)
+  }
+}
+
+//@ts-ignore
+const entireDataBaseLinkFunction = DataBaseLink.prototype.DataBaseLinkFunctionWrapper.toString(); 
+const paramsOfDataBaseLinkFunction = entireDataBaseLinkFunction.slice(entireDataBaseLinkFunction.indexOf("(") + 1, nthIndex(entireDataBaseLinkFunction, ")", 1));
+const bodyOfDataBaseLinkFunction = entireDataBaseLinkFunction.slice(entireDataBaseLinkFunction.indexOf("{") + 1, entireDataBaseLinkFunction.lastIndexOf("}"));
+
+export class DataLink<Value> {
+  constructor(private data: Data<Value>) {
+
+  }
+
+  public get(): Value
+  public get(subscription: Subscription<[Value]>, initialize?: boolean): DataSubscription<[Value]>
+  public get(subscription: DataSubscription<[Value]>, initialize?: boolean): DataSubscription<[Value]>
+  public get(...a: any[]) {
+    //@ts-ignore
+    return this.data.get(...a)
+  }
+
+  private isSubscribed(subscription: Subscription<[Value]>) {
+    //@ts-ignore
+    return this.data.isSubscribed(subscription)
+  }
+  private unsubscribe(subscription: Subscription<[Value]>) {
+    //@ts-ignore
+    return this.data.unsubscribe(subscription)
+  }
+  private subscribe(subscription: Subscription<[Value]>, initialize: boolean) {
+    //@ts-ignore
+    return this.data.subscribe(subscription, initialize)
+  }
+
+  public got(subscription: Subscription<[Value]> | DataSubscription<[Value]>): DataSubscription<[Value]> {
+    return this.got(subscription)
+  }
+
+
+  public set(value: Value): Value
+  public set(value: Value, wait: false): Value
+  public set(value: Value, wait: true): Promise<Value>
+  public set(...a: any[]): Value | Promise<Value> {
+    //@ts-ignore
+    return this.set(...a)
+  }
+
+  public toString() {
+    return this.data.toString()
+  }
+}
 
 
 
@@ -59,7 +142,6 @@ class InternalDataBase<Store extends ComplexData> extends Function {
 
     if (path_data_subscription instanceof Data || path_data_subscription instanceof DataCollection) {
 
-      let sym = Symbol()
       let erg: any
 
       let path: PathSegment = path_data_subscription
@@ -69,16 +151,16 @@ class InternalDataBase<Store extends ComplexData> extends Function {
 
       }
       else {
+        path.get()
         path.get((path) => {
-          erg = t[path]
-          erg[sym] = path
-        })
-        
+          erg.
+        }, false)
+        erg = t[path.get()]
 
       }
 
 
-
+      let link: DataLink<any> | DataBase<any> =  erg instanceof Data ? new DataLink(erg) : new DataBaseLink(erg)
       
 
       if (init_path === undefined) return erg
@@ -200,5 +282,5 @@ type DataBaseify<Type extends object> = {
 type DataBase<Store extends object> = OmitFunctionProperties<InternalDataBase<Store>["DataBaseFunction"]> & DataBaseify<Store>
 
 //@ts-ignore
-export const DataBase = InternalDataBase as ({ new<Store extends object>(store: Store): DataBase<Store> } )
+export const DataBase = InternalDataBase as ({ new<Store extends object>(store: Store): DataBase<Store> })
 
